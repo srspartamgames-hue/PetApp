@@ -1,4 +1,5 @@
 import { iconSprite, icon } from './icons.js';
+import { renderSwitcher } from './components/petSwitcher.js';
 import * as inicio from './views/inicio.js';
 import * as saude from './views/saude.js';
 import * as rotina from './views/rotina.js';
@@ -34,6 +35,7 @@ async function render() {
   outlet.innerHTML = '';
   await view.render(outlet, params);
   setActive(path);
+  await renderSwitcher();
   window.scrollTo(0, 0);
 }
 function init() {
