@@ -92,8 +92,10 @@ Todos visualmente coerentes, em claro e escuro:
 
 - Todas as cores são variáveis CSS; o tema é trocado por
   `document.documentElement.dataset.theme = 'dark' | 'light'`.
-- `js/theme.js`: lê `localStorage['petapp.theme']`; se ausente, segue
-  `prefers-color-scheme`. Expõe `initTheme()` e `toggleTheme()`.
+- `js/theme.js`: lê `localStorage['petapp.theme']`; se ausente, **começa sempre
+  no tema claro** (padrão). A preferência do sistema não é seguida; o usuário
+  alterna manualmente pelo toggle, e a escolha passa a persistir. Expõe
+  `initTheme()` e `toggleTheme()`.
 - Toggle **sol/lua** no cabeçalho; a escolha **persiste**.
 - Boot inline no `<head>` define o tema antes da primeira pintura (evita flash).
 
