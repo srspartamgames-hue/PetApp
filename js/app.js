@@ -12,6 +12,7 @@ import { getCurrentPetId } from './state.js';
 import { loadAlerts } from './alerts.js';
 import { todayISO } from './dates.js';
 import { maybeNotify } from './notify.js';
+import { seedDemo } from './demo-seed.js';
 
 const routes = { inicio, saude, rotina, alertas, pet, tutor };
 const NAV = {
@@ -68,6 +69,7 @@ async function init() {
   paintNav();
   paintThemeToggle();
   document.getElementById('theme-toggle').onclick = () => { toggleTheme(); paintThemeToggle(); };
+  await seedDemo();
   render();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
