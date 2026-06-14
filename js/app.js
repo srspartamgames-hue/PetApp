@@ -69,9 +69,15 @@ async function init() {
   paintNav();
   paintThemeToggle();
   document.getElementById('theme-toggle').onclick = () => { toggleTheme(); paintThemeToggle(); };
-  await seedDemo();
+  try { await seedDemo(); } catch (e) { console.error('seedDemo falhou', e); }
   render();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded) return; reloaded = true; location.reload();
+    });
+  }
 }
 window.addEventListener('hashchange', render);
 window.addEventListener('DOMContentLoaded', init);

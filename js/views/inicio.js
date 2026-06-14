@@ -37,6 +37,15 @@ export async function render(outlet) {
   outlet.append(el(`<div class="card"><div class="s" style="margin-bottom:8px">Status de saúde</div>
     <span class="pill ${scls}">${icon(sico)} ${stxt}</span></div>`));
 
+  // Mini-painel de infos interessantes
+  const pesoAtual = pesos.length ? pesos.slice().sort((a,b)=>a.data.localeCompare(b.data)).pop().valor : null;
+  const prox = alerts.length
+    ? (alerts[0].daysUntil < 0 ? 'Atrasado' : alerts[0].daysUntil === 0 ? 'Hoje' : `${alerts[0].daysUntil} dia(s)`)
+    : 'Em dia';
+  const metrics = [['Idade', sub || '—'], ['Peso atual', pesoAtual != null ? `${pesoAtual} kg` : '—'], ['Próximo cuidado', prox]];
+  outlet.append(el(`<div class="metrics">${metrics.map(([l,v]) =>
+    `<div class="metric"><div class="ml">${l}</div><div class="mv">${v}</div></div>`).join('')}</div>`));
+
   // Peso
   if (pesos.length) {
     const ord = pesos.slice().sort((a,b)=>a.data.localeCompare(b.data));
