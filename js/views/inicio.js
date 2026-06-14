@@ -1,6 +1,7 @@
 import * as db from '../db.js';
 import { getCurrentPetId } from '../state.js';
 import { el, icon } from '../ui.js';
+import { mascot } from '../mascots.js';
 import { overallStatus, loadAlerts } from '../alerts.js';
 import { weightChart } from '../components/chart.js';
 import { ageString, formatBR, todayISO } from '../dates.js';
@@ -11,7 +12,7 @@ export async function render(outlet) {
   const petId = getCurrentPetId();
   outlet.innerHTML = '';
   if (!petId) {
-    outlet.append(el(`<div class="empty">${icon('paw')}
+    outlet.append(el(`<div class="empty">${mascot('')}
       <p>Bem-vindo ao PetApp!<br>Comece cadastrando seu pet.</p>
       <a class="btn primary" href="#/pet/novo">Cadastrar pet</a></div>`));
     return;
@@ -26,7 +27,7 @@ export async function render(outlet) {
   const sub = pet.nascimento ? ageString(pet.nascimento, hoje) : (pet.idadeAprox || '');
   outlet.append(el(`<div class="card card-row">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--teal-50);overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--teal-400)">
-      ${pet.foto?`<img src="${pet.foto}" style="width:100%;height:100%;object-fit:cover">`:icon('paw')}</div>
+      ${pet.foto?`<img src="${pet.foto}" style="width:100%;height:100%;object-fit:cover">`:mascot(pet.especie)}</div>
     <div class="rec-main"><h2>${pet.nome}</h2><div class="s">${[pet.especie,pet.raca,sub].filter(Boolean).join(' · ')}</div></div>
     <a class="icon-btn" href="#/pet/${pet.id}">${icon('edit')}</a></div>`));
 
