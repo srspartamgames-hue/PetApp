@@ -1,4 +1,5 @@
 import { iconSprite, icon } from './icons.js';
+import { initTheme, toggleTheme, currentTheme } from './theme.js';
 import { renderSwitcher } from './components/petSwitcher.js';
 import * as inicio from './views/inicio.js';
 import * as saude from './views/saude.js';
@@ -30,6 +31,10 @@ function paintNav() {
     a.innerHTML = `${icon(NAV[p].icon)}<span>${NAV[p].label}</span>`;
   });
 }
+function paintThemeToggle() {
+  const b = document.getElementById('theme-toggle');
+  b.innerHTML = icon(currentTheme() === 'dark' ? 'sun' : 'moon');
+}
 function setActive(path) {
   document.querySelectorAll('#nav a').forEach(a =>
     a.classList.toggle('active', a.dataset.path === path));
@@ -57,9 +62,12 @@ async function render() {
   if (alerts) maybeNotify(alerts);
   window.scrollTo(0, 0);
 }
-function init() {
+async function init() {
   document.getElementById('sprite').innerHTML = iconSprite();
+  initTheme();
   paintNav();
+  paintThemeToggle();
+  document.getElementById('theme-toggle').onclick = () => { toggleTheme(); paintThemeToggle(); };
   render();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
