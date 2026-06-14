@@ -44,3 +44,13 @@ export async function get(name, key) { return done((await store(name, 'readonly'
 export async function put(name, value) { return done((await store(name, 'readwrite')).put(value)); }
 export async function remove(name, key) { return done((await store(name, 'readwrite')).delete(key)); }
 export async function clearStore(name) { return done((await store(name, 'readwrite')).clear()); }
+
+export async function removePet(petId) {
+  for (const name of LIST_STORES) {
+    if (name === 'pets') continue;
+    const rows = await getAll(name, petId);
+    for (const r of rows) await remove(name, r.id);
+  }
+  await remove('saude', petId);
+  await remove('pets', petId);
+}

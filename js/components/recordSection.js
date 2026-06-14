@@ -1,7 +1,6 @@
 import * as db from '../db.js';
 import { el, fieldForm, icon, toast, confirmDialog } from '../ui.js';
 import { accordionItem } from './accordion.js';
-import { formatBR } from '../dates.js';
 
 /* config: { store, title, icon, fields:[spec], line:(r)=>({t,s}) } */
 export function recordSection(config, petId) {
@@ -48,4 +47,3 @@ export function recordSection(config, petId) {
     document.body.append(scrim);
   }
 }
-export { formatBR };

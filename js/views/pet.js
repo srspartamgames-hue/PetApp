@@ -45,7 +45,8 @@ async function list(outlet) {
         <button class="icon-btn" data-del>${icon('trash')}</button></div>`);
       row.querySelector('[data-del]').onclick = async () => {
         if (await confirmDialog(`Excluir ${p.nome} e todo o histórico?`)) {
-          await db.remove('pets', p.id);
+          await db.removePet(p.id);
+          if (getCurrentPetId() === p.id) setCurrentPetId('');
           toast('Pet excluído'); list(outlet);
         }
       };
