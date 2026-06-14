@@ -2,12 +2,14 @@ import * as db from './db.js';
 import { setCurrentPetId } from './state.js';
 import { todayISO, addMonths, addDays } from './dates.js';
 
-const FLAG = 'petapp.seeded';
+const OPT_OUT = 'petapp.noDemo';
 
 export async function seedDemo() {
-  try { if (localStorage.getItem(FLAG)) return; } catch { return; }
+  // Não semeia se o usuário optou por sair do demo ("Começar do zero").
+  try { if (localStorage.getItem(OPT_OUT)) return; } catch { return; }
   const pets = await db.getAll('pets');
-  if (pets.length) { try { localStorage.setItem(FLAG, '1'); } catch {} return; }
+  // Já há dados (o próprio demo ou um pet do usuário) → não mexe.
+  if (pets.length) return;
 
   const t = todayISO();
   const petId = await db.put('pets', {
@@ -51,6 +53,4 @@ export async function seedDemo() {
   await db.put('rotina', { petId, titulo: 'Suplemento ômega-3', tipo: 'Medicamento', horario: '20:00' });
   await db.put('rotinaLog', { petId, rotinaId: r1, data: t });
   await db.put('rotinaLog', { petId, rotinaId: r2, data: t });
-
-  try { localStorage.setItem(FLAG, '1'); } catch {}
 }
