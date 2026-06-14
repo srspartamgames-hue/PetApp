@@ -44,5 +44,15 @@ export async function render(outlet) {
       toast('Tudo limpo'); location.hash = '#/inicio'; location.reload();
     }
   };
-  wrap.append(card); wrap.append(bkp); wrap.append(danger); outlet.innerHTML=''; outlet.append(wrap);
+  const demo = el(`<div class="card"><h3 style="margin-bottom:var(--sp-3)">Pet de demonstração</h3>
+    <p class="s" style="margin-top:0;color:var(--text-2)">Carrega o "Thor" (Dobermann) com dados de exemplo para explorar o app. Isso substitui os dados atuais.</p>
+    <button class="btn primary block" data-demo>${icon('paw')} Usar o cão de demonstração</button></div>`);
+  demo.querySelector('[data-demo]').onclick = async () => {
+    if (await confirmDialog('Isto vai substituir os dados atuais pelo pet de demonstração (Thor). Continuar?', { ok: 'Usar demo', danger: false })) {
+      for (const s of db.ALL_STORES) await db.clearStore(s);
+      try { localStorage.removeItem('petapp.seeded'); localStorage.removeItem('petapp.currentPet'); } catch {}
+      toast('Carregando demo…'); location.hash = '#/inicio'; location.reload();
+    }
+  };
+  wrap.append(card); wrap.append(bkp); wrap.append(demo); wrap.append(danger); outlet.innerHTML=''; outlet.append(wrap);
 }
