@@ -5,11 +5,10 @@ import { todayISO, addMonths, addDays } from './dates.js';
 const OPT_OUT = 'petapp.noDemo';
 
 export async function seedDemo() {
-  // Não semeia se o usuário optou por sair do demo ("Começar do zero").
+  // Modo vitrine: a cada carregamento restaura o Thor pristino — exceto se o
+  // usuário optou por sair do demo via "Começar do zero" (flag petapp.noDemo).
   try { if (localStorage.getItem(OPT_OUT)) return; } catch { return; }
-  const pets = await db.getAll('pets');
-  // Já há dados (o próprio demo ou um pet do usuário) → não mexe.
-  if (pets.length) return;
+  await Promise.all(db.ALL_STORES.map(s => db.clearStore(s)));
 
   const t = todayISO();
   const petId = await db.put('pets', {

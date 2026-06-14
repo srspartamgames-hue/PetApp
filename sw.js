@@ -1,4 +1,4 @@
-const CACHE = 'petapp-v4';
+const CACHE = 'petapp-v5';
 const ASSETS = [
   './', './index.html', './manifest.json', './css/styles.css',
   './js/app.js', './js/state.js', './js/db.js', './js/dates.js', './js/alerts.js',
@@ -24,9 +24,12 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
-    const copy = res.clone();
-    caches.open(CACHE).then(c => c.put(e.request, copy)).catch(()=>{});
-    return res;
-  }).catch(() => caches.match('./index.html'))));
+  // Network-first: online sempre serve a versão mais nova; cache é fallback offline.
+  e.respondWith(
+    fetch(e.request).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy)).catch(()=>{});
+      return res;
+    }).catch(() => caches.match(e.request).then(hit => hit || caches.match('./index.html')))
+  );
 });
