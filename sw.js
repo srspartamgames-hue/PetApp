@@ -1,4 +1,4 @@
-const CACHE = 'petapp-v2';
+const CACHE = 'petapp-v3';
 const ASSETS = [
   './', './index.html', './manifest.json', './css/styles.css',
   './js/app.js', './js/state.js', './js/db.js', './js/dates.js', './js/alerts.js',
