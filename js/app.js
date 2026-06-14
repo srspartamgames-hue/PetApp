@@ -6,6 +6,11 @@ import * as rotina from './views/rotina.js';
 import * as alertas from './views/alertas.js';
 import * as pet from './views/pet.js';
 import * as tutor from './views/tutor.js';
+import * as db from './db.js';
+import { getCurrentPetId } from './state.js';
+import { loadAlerts } from './alerts.js';
+import { todayISO } from './dates.js';
+import { maybeNotify } from './notify.js';
 
 const routes = { inicio, saude, rotina, alertas, pet, tutor };
 const NAV = {
@@ -29,6 +34,18 @@ function setActive(path) {
   document.querySelectorAll('#nav a').forEach(a =>
     a.classList.toggle('active', a.dataset.path === path));
 }
+async function updateBadge() {
+  const link = document.querySelector('#nav a[data-path="alertas"]');
+  const petId = getCurrentPetId();
+  link.querySelector('.badge')?.remove();
+  if (!petId) return;
+  const alerts = await loadAlerts(db, petId, todayISO());
+  if (alerts.length) {
+    const b = document.createElement('span'); b.className = 'badge'; b.textContent = alerts.length;
+    link.appendChild(b);
+  }
+  return alerts;
+}
 async function render() {
   const { path, params } = parseHash();
   const view = routes[path] || routes.inicio;
@@ -36,6 +53,8 @@ async function render() {
   await view.render(outlet, params);
   setActive(path);
   await renderSwitcher();
+  const alerts = await updateBadge();
+  if (alerts) maybeNotify(alerts);
   window.scrollTo(0, 0);
 }
 function init() {

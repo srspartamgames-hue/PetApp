@@ -26,3 +26,7 @@ export function overallStatus(data, today) {
   if (st.includes('warn')) return 'warn';
   return 'ok';
 }
+export async function loadAlerts(db, petId, today) {
+  const [vacinas, vermifugos] = await Promise.all([db.getAll('vacinas', petId), db.getAll('vermifugos', petId)]);
+  return buildAlerts({ vacinas, vermifugos }, today);
+}
