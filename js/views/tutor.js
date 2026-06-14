@@ -40,7 +40,7 @@ export async function render(outlet) {
   danger.querySelector('[data-reset]').onclick = async () => {
     if (await confirmDialog('Limpar TODOS os dados deste navegador? Esta ação não pode ser desfeita.', { ok: 'Limpar tudo' })) {
       for (const s of db.ALL_STORES) await db.clearStore(s);
-      try { localStorage.setItem('petapp.seeded', '1'); localStorage.removeItem('petapp.currentPet'); } catch {}
+      try { localStorage.setItem('petapp.noDemo', '1'); localStorage.removeItem('petapp.currentPet'); } catch {}
       toast('Tudo limpo'); location.hash = '#/inicio'; location.reload();
     }
   };
@@ -50,7 +50,7 @@ export async function render(outlet) {
   demo.querySelector('[data-demo]').onclick = async () => {
     if (await confirmDialog('Isto vai substituir os dados atuais pelo pet de demonstração (Thor). Continuar?', { ok: 'Usar demo', danger: false })) {
       for (const s of db.ALL_STORES) await db.clearStore(s);
-      try { localStorage.removeItem('petapp.seeded'); localStorage.removeItem('petapp.currentPet'); } catch {}
+      try { localStorage.removeItem('petapp.noDemo'); localStorage.removeItem('petapp.currentPet'); } catch {}
       toast('Carregando demo…'); location.hash = '#/inicio'; location.reload();
     }
   };
