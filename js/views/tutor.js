@@ -1,5 +1,5 @@
 import * as db from '../db.js';
-import { el, fieldForm, icon, toast } from '../ui.js';
+import { el, fieldForm, icon, toast, confirmDialog } from '../ui.js';
 import { exportData, importData } from '../backup.js';
 
 const SPEC = [
@@ -34,5 +34,15 @@ export async function render(outlet) {
     try { await importData(f); toast('Backup importado'); location.reload(); }
     catch { toast('Arquivo inválido'); }
   };
-  wrap.append(card); wrap.append(bkp); outlet.innerHTML=''; outlet.append(wrap);
+  const danger = el(`<div class="card"><h3 style="margin-bottom:var(--sp-3)">Começar do zero</h3>
+    <p class="s" style="margin-top:0;color:var(--text-2)">Remove o pet de demonstração e todos os dados deste navegador para você usar o app com o seu próprio pet.</p>
+    <button class="btn danger block" data-reset>${icon('trash')} Limpar tudo</button></div>`);
+  danger.querySelector('[data-reset]').onclick = async () => {
+    if (await confirmDialog('Limpar TODOS os dados deste navegador? Esta ação não pode ser desfeita.')) {
+      for (const s of db.ALL_STORES) await db.clearStore(s);
+      try { localStorage.setItem('petapp.seeded', '1'); localStorage.removeItem('petapp.currentPet'); } catch {}
+      toast('Tudo limpo'); location.hash = '#/inicio'; location.reload();
+    }
+  };
+  wrap.append(card); wrap.append(bkp); wrap.append(danger); outlet.innerHTML=''; outlet.append(wrap);
 }
