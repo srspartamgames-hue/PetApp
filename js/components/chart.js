@@ -15,7 +15,7 @@ export function weightChart(pontos) {
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Evolução de peso">
     <polyline points="${pts}" fill="none" stroke="#19B888" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
     ${dots}
-    <text x="${P}" y="14" font-size="11" fill="#8A9A95">${min.toFixed(1)}–${max.toFixed(1)} kg</text>
-    <text x="${W-P}" y="${H-6}" font-size="11" fill="#5B6B66" text-anchor="end">${formatBR(last.data)}</text>
+    <text x="${P}" y="14" font-size="11" fill="var(--text-3)">${min.toFixed(1)}–${max.toFixed(1)} kg</text>
+    <text x="${W-P}" y="${H-6}" font-size="11" fill="var(--text-2)" text-anchor="end">${formatBR(last.data)}</text>
   </svg>`;
 }
