@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { daysUntil, formatBR, ageString, addMonths, todayISO } from '../js/dates.js';
+import { daysUntil, formatBR, ageString, addMonths, todayISO, addDays } from '../js/dates.js';
 
 test('daysUntil conta dias com sinal', () => {
   assert.equal(daysUntil('2026-06-20', '2026-06-14'), 6);
@@ -21,4 +21,9 @@ test('addMonths soma meses', () => {
 });
 test('todayISO retorna a data local da Date dada', () => {
   assert.equal(todayISO(new Date(2026, 5, 14, 9, 0)), '2026-06-14');
+});
+test('addDays soma e subtrai dias', () => {
+  assert.equal(addDays('2026-06-14', 5), '2026-06-19');
+  assert.equal(addDays('2026-06-01', -25), '2026-05-07');
+  assert.equal(addDays('2026-12-31', 1), '2027-01-01');
 });

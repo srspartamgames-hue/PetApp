@@ -1,6 +1,7 @@
 import * as db from '../db.js';
 import { getCurrentPetId, setCurrentPetId } from '../state.js';
 import { el, fieldForm, icon, toast, confirmDialog } from '../ui.js';
+import { mascot } from '../mascots.js';
 import { ageString, formatBR, todayISO } from '../dates.js';
 
 const SPEC = [
@@ -32,14 +33,14 @@ async function list(outlet) {
     <h1>Meus pets</h1>
     <a class="btn primary" style="margin-left:auto" href="#/pet/novo">${icon('plus')} Novo</a></div>`));
   if (!pets.length) {
-    box.append(el(`<div class="empty">${icon('paw')}<p>Nenhum pet ainda.<br>Cadastre o primeiro!</p>
+    box.append(el(`<div class="empty">${mascot('')}<p>Nenhum pet ainda.<br>Cadastre o primeiro!</p>
       <a class="btn primary" href="#/pet/novo">Cadastrar pet</a></div>`));
   } else {
     for (const p of pets) {
       const sub = p.nascimento ? ageString(p.nascimento, todayISO()) : (p.idadeAprox || '');
       const row = el(`<div class="card card-row">
         <div style="width:48px;height:48px;border-radius:50%;background:var(--teal-50);overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--teal-400)">
-          ${p.foto ? `<img src="${p.foto}" style="width:100%;height:100%;object-fit:cover">` : icon('paw')}</div>
+          ${p.foto ? `<img src="${p.foto}" style="width:100%;height:100%;object-fit:cover">` : mascot(p.especie)}</div>
         <div class="rec-main"><div class="t">${p.nome}</div><div class="s">${[p.especie,p.raca,sub].filter(Boolean).join(' · ')}</div></div>
         <a class="icon-btn" href="#/pet/${p.id}">${icon('edit')}</a>
         <button class="icon-btn" data-del>${icon('trash')}</button></div>`);

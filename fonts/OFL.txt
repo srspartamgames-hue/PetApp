@@ -1,0 +1,8 @@
+Fontes empacotadas neste diretório:
+
+- Fredoka — Copyright The Fredoka Project Authors (Google). SIL Open Font License 1.1.
+- Nunito  — Copyright The Nunito Project Authors (Vernon Adams, Cyreal). SIL Open Font License 1.1.
+
+Ambas distribuídas sob a SIL Open Font License, Version 1.1.
+Texto completo da licença: https://openfontlicense.org
+Arquivos woff2 obtidos via @fontsource (https://fontsource.org).

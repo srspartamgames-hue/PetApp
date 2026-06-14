@@ -1,4 +1,5 @@
 import { iconSprite, icon } from './icons.js';
+import { initTheme, toggleTheme, currentTheme } from './theme.js';
 import { renderSwitcher } from './components/petSwitcher.js';
 import * as inicio from './views/inicio.js';
 import * as saude from './views/saude.js';
@@ -11,6 +12,7 @@ import { getCurrentPetId } from './state.js';
 import { loadAlerts } from './alerts.js';
 import { todayISO } from './dates.js';
 import { maybeNotify } from './notify.js';
+import { seedDemo } from './demo-seed.js';
 
 const routes = { inicio, saude, rotina, alertas, pet, tutor };
 const NAV = {
@@ -29,6 +31,10 @@ function paintNav() {
     const p = a.dataset.path;
     a.innerHTML = `${icon(NAV[p].icon)}<span>${NAV[p].label}</span>`;
   });
+}
+function paintThemeToggle() {
+  const b = document.getElementById('theme-toggle');
+  b.innerHTML = icon(currentTheme() === 'dark' ? 'sun' : 'moon');
 }
 function setActive(path) {
   document.querySelectorAll('#nav a').forEach(a =>
@@ -57,9 +63,13 @@ async function render() {
   if (alerts) maybeNotify(alerts);
   window.scrollTo(0, 0);
 }
-function init() {
+async function init() {
   document.getElementById('sprite').innerHTML = iconSprite();
+  initTheme();
   paintNav();
+  paintThemeToggle();
+  document.getElementById('theme-toggle').onclick = () => { toggleTheme(); paintThemeToggle(); };
+  await seedDemo();
   render();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
