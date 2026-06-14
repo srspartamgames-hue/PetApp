@@ -2,6 +2,7 @@ import * as db from '../db.js';
 import { getCurrentPetId } from '../state.js';
 import { el, fieldForm, icon, toast, confirmDialog } from '../ui.js';
 import { todayISO } from '../dates.js';
+import { celebrate } from '../confetti.js';
 
 const SPEC = [
   { name:'titulo', label:'Item', required:true, placeholder:'ex.: Ração da manhã' },
@@ -42,7 +43,12 @@ async function draw(outlet, petId) {
         return;
       }
       if (isDone) { const log = logs.find(l => l.rotinaId === it.id && l.data === hoje); if (log) await db.remove('rotinaLog', log.id); }
-      else { await db.put('rotinaLog', { petId, rotinaId: it.id, data: hoje }); }
+      else {
+        await db.put('rotinaLog', { petId, rotinaId: it.id, data: hoje });
+        const logsNow = await db.getAll('rotinaLog', petId);
+        const feitosNow = new Set(logsNow.filter(l => l.data === hoje).map(l => l.rotinaId));
+        if (itens.length > 0 && itens.every(i => feitosNow.has(i.id))) celebrate();
+      }
       draw(outlet, petId);
     };
     outlet.append(row);
