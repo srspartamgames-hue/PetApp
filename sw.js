@@ -1,0 +1,25 @@
+const CACHE = 'petapp-v1';
+const ASSETS = [
+  './', './index.html', './manifest.json', './css/styles.css',
+  './js/app.js', './js/state.js', './js/db.js', './js/dates.js', './js/alerts.js',
+  './js/backup.js', './js/icons.js', './js/ui.js', './js/notify.js',
+  './js/components/accordion.js', './js/components/recordSection.js',
+  './js/components/chart.js', './js/components/petSwitcher.js',
+  './js/views/inicio.js', './js/views/saude.js', './js/views/rotina.js',
+  './js/views/alertas.js', './js/views/pet.js', './js/views/tutor.js',
+  './icons/icon-192.png', './icons/icon-512.png'
+];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
+    const copy = res.clone();
+    caches.open(CACHE).then(c => c.put(e.request, copy)).catch(()=>{});
+    return res;
+  }).catch(() => caches.match('./index.html'))));
+});
