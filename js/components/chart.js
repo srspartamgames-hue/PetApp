@@ -1,8 +1,37 @@
 function fmtKg(v) { return (Math.round(v * 10) / 10).toString().replace('.', ','); }
 function shortDate(iso) { if (!iso) return ''; const p = iso.split('-'); return `${p[2]}/${p[1]}`; }
 
+// Posiciona e preenche a "bolha" de peso acima do ponto (abaixo se perto do topo),
+// alinhada para dentro nas pontas para não sair do gráfico.
+function posTip(tip, c) {
+  const cx = +c.getAttribute('cx'), cy = +c.getAttribute('cy');
+  tip.textContent = c.getAttribute('data-v') + ' kg';
+  tip.setAttribute('text-anchor', cx < 44 ? 'start' : cx > 276 ? 'end' : 'middle');
+  tip.setAttribute('x', cx);
+  tip.setAttribute('y', cy > 42 ? cy - 12 : cy + 20);
+}
+
+// Handler global (definido uma vez): hover do mouse mostra/oculta; toque (iPhone)
+// fixa o peso do ponto tocado. A bolinha cresce um pouco em ambos os casos.
+if (typeof window !== 'undefined' && !window.__wc) {
+  window.__wc = function (c, e) {
+    const svg = c.ownerSVGElement; if (!svg) return;
+    const tip = svg.querySelector('.wtip'); if (!tip) return;
+    const grow = () => { c.style.transform = 'scale(1.55)'; posTip(tip, c); tip.style.opacity = '1'; };
+    if (e.type === 'pointerenter') { if (e.pointerType === 'mouse') grow(); }
+    else if (e.type === 'pointerleave') { if (e.pointerType === 'mouse') { c.style.transform = ''; tip.style.opacity = '0'; } }
+    else if (e.type === 'pointerdown') {
+      if (e.pointerType !== 'mouse') {
+        svg.querySelectorAll('circle[data-v]').forEach(o => { o.style.transform = ''; });
+        grow();
+      }
+    }
+  };
+}
+
 /* pontos: [{data:'YYYY-MM-DD', valor:Number}] em ordem crescente por data.
-   Gráfico de linha com eixos X (datas) e Y (kg), pontos rotulados e área suave.
+   Linha de peso com eixos X (datas) e Y (kg) e área suave. O peso de cada ponto
+   aparece ao passar o mouse ou tocar na bolinha (sem rótulos fixos).
    Cores via variáveis CSS → adapta ao tema claro/escuro. */
 export function weightChart(pontos) {
   const W = 320, H = 172;
@@ -37,21 +66,9 @@ export function weightChart(pontos) {
     + coords.map(c => `L ${c[0].toFixed(1)} ${c[1].toFixed(1)}`).join(' ')
     + ` L ${coords[coords.length - 1][0].toFixed(1)} ${y1} Z`;
 
-  const dots = coords.map(c =>
-    `<circle cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="4.5" fill="var(--teal-400)" stroke="var(--surface)" stroke-width="2"/>`).join('');
-
-  // Rótulos de valor: só com poucos pontos; sempre ACIMA do ponto (abaixo apenas
-  // se muito perto do topo) — nunca embaixo, onde ficam as datas. Pontas alinhadas
-  // para dentro para não invadir os eixos.
-  let valLabels = '';
-  if (pontos.length <= 7) {
-    valLabels = coords.map((c, i) => {
-      const above = c[1] - 10 > PT + 4;
-      const ly = above ? c[1] - 9 : c[1] + 16;
-      const anchor = i === 0 ? 'start' : i === pontos.length - 1 ? 'end' : 'middle';
-      return `<text x="${c[0].toFixed(1)}" y="${ly.toFixed(1)}" font-size="10.5" font-weight="700" fill="var(--teal-600)" text-anchor="${anchor}" font-family="var(--display)">${fmtKg(pontos[i].valor)}</text>`;
-    }).join('');
-  }
+  // Bolinhas interativas (peso aparece no hover/toque)
+  const dots = coords.map((c, i) =>
+    `<circle cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="4.5" fill="var(--teal-400)" stroke="var(--surface)" stroke-width="2" data-v="${fmtKg(pontos[i].valor)}" style="cursor:pointer;transform-box:fill-box;transform-origin:center;transition:transform .12s ease" onpointerenter="__wc(this,event)" onpointerleave="__wc(this,event)" onpointerdown="__wc(this,event)"/>`).join('');
 
   // Datas no eixo X: no máximo ~6 rótulos para não amontoar.
   const maxL = 6, stepL = Math.ceil(pontos.length / maxL);
@@ -61,10 +78,13 @@ export function weightChart(pontos) {
     return `<text x="${X(i).toFixed(1)}" y="${(y1 + 16).toFixed(1)}" font-size="9.5" fill="var(--text-3)" text-anchor="${anchor}">${shortDate(p.data)}</text>`;
   }).join('');
 
+  // Bolha de peso (uma só, mostrada sob demanda) — fica por cima de tudo.
+  const tip = `<text class="wtip" x="0" y="0" font-size="11" font-weight="700" fill="var(--teal-600)" font-family="var(--display)" text-anchor="middle" style="opacity:0;transition:opacity .12s ease;pointer-events:none"></text>`;
+
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Evolução de peso">`
     + grid
     + `<path d="${areaPath}" fill="var(--teal-50)"/>`
     + `<polyline points="${linePts}" fill="none" stroke="var(--teal-400)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`
-    + dots + valLabels + xLabels
+    + dots + xLabels + tip
     + `</svg>`;
 }
